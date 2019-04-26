@@ -19,10 +19,8 @@ const Route = use('Route')
 Route.group(() => {
   /** shipment routes endpoints */
   Route.get('shipments/all-shipments', 'ShipmentController.index')
+  Route.get('shipments/view/:id', 'ShipmentController.show')
   Route.post('shipments/store', 'ShipmentController.store') 
-  Route.post('shipments/update', 'ShipmentController.update')
-
-  /** tracking routes endpoints */
-  // Route.get('tracking/track-parcel', 'TrackingController.trackParcel')
+  Route.get('shipments/track/:tracking_number', 'ShipmentController.track')
 
 }).prefix('api/v1')

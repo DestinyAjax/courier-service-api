@@ -9,7 +9,6 @@ const Sender = use('App/Models/Sender')
 const Receiver = use('App/Models/Receiver')
 const Helpers = use('App/Models/Traits/Helpers')
 const Validator = use('App/Models/Traits/Validator')
-const Database = use('Database')
 const { validate } = use('Validator')
 
 /**
@@ -26,24 +25,12 @@ class ShipmentController {
    * @param {View} ctx.view
    */
   async index ({ request, response}) {
-    const records = await Shipment.all()
+    const records = await Shipment.query().with('sender').with('receiver').fetch()
 
     response.status(201).json({
       status: 'success',
       data: records
     })
-  }
-
-  /**
-   * Render a form to be used for creating a new shipment.
-   * GET shipments/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response}) {
   }
 
   /**
@@ -77,11 +64,13 @@ class ShipmentController {
     shipment.parcel = params.parcel
     shipment.height = params.height
     shipment.width = params.width
+    shipment.origin = sender.sender_address.toUpperCase()
+    shipment.destination = receiver.receiver_address.toUpperCase()
     shipment.depth = (params.depth) ? params.depth : null
     shipment.shipment_type = params.shipment_type
-    shipment.distance = params.distance + 'mi'
+    shipment.distance = params.distance
     shipment.tracking_number = tracking_number
-    shipment.weight = params.weight + 'kg'
+    shipment.weight = params.weight
     await shipment.save()
 
     response.status(200).json({
@@ -95,8 +84,10 @@ class ShipmentController {
         "depth": shipment.depth,
         "shipment_type": shipment.shipment_type,
         "distance": shipment.distance,
-        "tracking_number": shipment.tracking_number,
         "weight": shipment.weight,
+        "tracking_number": shipment.tracking_number,
+        "origin": shipment.origin,
+        "destination": shipment.destination,
         "created_at": shipment.created_at,
         "id": shipment.id
       }
@@ -145,6 +136,28 @@ class ShipmentController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
+    if(!params.id) return;
+    const shipment = await Shipment.find(params.id)
+    
+    response.status(200).json({
+      status: 'success',
+      data: {
+        "sender": await shipment.sender().fetch(),
+        "receiver": await shipment.receiver().fetch(),
+        "parcel": shipment.parcel,
+        "height": shipment.height,
+        "width": shipment.width,
+        "depth": shipment.depth,
+        "shipment_type": shipment.shipment_type,
+        "distance": shipment.distance,
+        "weight": shipment.weight,
+        "tracking_number": shipment.tracking_number,
+        "origin": shipment.origin,
+        "destination": shipment.destination,
+        "created_at": shipment.created_at,
+        "id": shipment.id
+      }
+    }) 
   }
 
   /**
@@ -155,7 +168,24 @@ class ShipmentController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async track ({ params, request, response }) {
+    if(!params.tracking_number) return
+
+    const shipment = await Shipment.findBy('tracking_number', params.tracking_number)
+    if(shipment) {
+      response.status(200).json({
+        status: 'success',
+        data: {
+          "parcel": shipment.parcel,
+          "distance": shipment.distance + " mi",
+          "weight": shipment.weight + " kg",
+          "origin": shipment.origin,
+          "destination": shipment.destination,
+          "created_at": shipment.created_at,
+          "status": Helpers.getShipmentStatus(shipment.status)
+        }
+      }) 
+    }
   }
 
   /**
