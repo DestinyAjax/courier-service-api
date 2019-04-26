@@ -16,6 +16,12 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
-})
+Route.group(() => {
+  /** shipment routes endpoints */
+  Route.get('shipments/all-shipments', 'ShipmentController.index')
+  Route.post('shipments/store', 'ShipmentController.store') 
+  Route.post('shipments/update', 'ShipmentController.update')
+
+  /** tracking routes endpoints */
+
+}).prefix('api/v1')
