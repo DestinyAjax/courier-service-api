@@ -1,19 +1,18 @@
-# Adonis API application
+# Courier Service API application
 
-This is the boilerplate for creating an API server in AdonisJs, it comes pre-configured with.
+This is simple closed API for Courier Service
 
-1. Bodyparser
-2. Authentication
-3. CORS
-4. Lucid ORM
-5. Migrations and seeds
+1. Create/Book Shipment
+2. View All Shipments
+3. View a single shipment
+4. Track a shipment delivery status
 
 ## Setup
 
-Use the adonis command to install the blueprint
+Use the npm command to install the application
 
 ```bash
-adonis new yardstick --api-only
+npm install
 ```
 
 or manually clone the repo and then run `npm install`.

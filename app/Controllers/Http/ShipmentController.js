@@ -73,6 +73,8 @@ class ShipmentController {
     shipment.weight = params.weight
     await shipment.save()
 
+    const billing = Helpers.generateBilling(shipment)
+
     response.status(200).json({
       status: 'success',
       data: {
@@ -89,7 +91,8 @@ class ShipmentController {
         "origin": shipment.origin,
         "destination": shipment.destination,
         "created_at": shipment.created_at,
-        "id": shipment.id
+        "id": shipment.id,
+        "billing_details": billing
       }
     }) 
   }
@@ -185,6 +188,11 @@ class ShipmentController {
           "status": Helpers.getShipmentStatus(shipment.status)
         }
       }) 
+    } else {
+      response.status(200).json({
+        status: 'success',
+        data: {}
+      })
     }
   }
 
