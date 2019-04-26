@@ -23,5 +23,6 @@ Route.group(() => {
   Route.post('shipments/update', 'ShipmentController.update')
 
   /** tracking routes endpoints */
+  // Route.get('tracking/track-parcel', 'TrackingController.trackParcel')
 
 }).prefix('api/v1')
